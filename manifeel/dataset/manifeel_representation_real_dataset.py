@@ -13,7 +13,7 @@ from diffusion_policy.model.common.normalizer import LinearNormalizer
 from diffusion_policy.dataset.base_dataset import BaseImageDataset
 from diffusion_policy.common.normalize_util import get_image_range_normalizer
 
-class TVBRepresentationDataset(BaseImageDataset):
+class ManifeelRepresentationDataset(BaseImageDataset):
     def __init__(self,
             shape_meta: dict,
             zarr_path: str, 
@@ -176,7 +176,7 @@ if __name__=='__main__':
     def main(cfg: OmegaConf):
         OmegaConf.resolve(cfg)
         # configure dataset
-        dataset = TVBRepresentationDataset(**cfg.dataset)
+        dataset = ManifeelRepresentationDataset(**cfg.dataset)
         assert isinstance(dataset, BaseImageDataset)
 
         print("🚀Dataset length: ", len(dataset))

@@ -13,7 +13,7 @@ from diffusion_policy.model.common.normalizer import LinearNormalizer
 from diffusion_policy.dataset.base_dataset import BaseImageDataset
 from diffusion_policy.common.normalize_util import get_image_range_normalizer
 
-class TVBDataset(BaseImageDataset):
+class ManifeelLightDataset(BaseImageDataset):
     def __init__(self,
             shape_meta: dict,
             zarr_path: str, 

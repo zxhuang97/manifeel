@@ -33,7 +33,7 @@ env_runner:
   zero_action_dims: [3, 4, 5]
 
 dataset:
-  _target_: manifeel.dataset.tvb_dataset_light_change.TVBDataset
+  _target_: manifeel.dataset.manifeel_light_dataset.ManifeelLightDataset
   shape_meta: ${shape_meta}
   zarr_path: ${dataset_path}
   horizon: ${horizon}
