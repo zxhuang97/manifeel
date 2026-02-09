@@ -1,8 +1,8 @@
 """
 Usage:
 python eval.py \
---checkpoint /scratch/gilbreth/luu15/Projects/manifeel/data/outputs/vision_sPiHezy_90/42/checkpoints/latest_epoch224.ckpt \
--o /scratch/gilbreth/luu15/Projects/manifeel/data/outputs/vision_sPiHezy_90/42/eval_output \
+--checkpoint /scratch/gilbreth/luu15/Projects/TVB/data/outputs/vision_sPiHezy_90/42/checkpoints/latest_epoch224.ckpt \
+-o /scratch/gilbreth/luu15/Projects/TVB/data/outputs/vision_sPiHezy_90/42/eval_output \
 -d cuda:0
 """
 
@@ -36,7 +36,7 @@ def main(checkpoint, output_dir, cfg_name, device):
     
     # Initialize Hydra
     hydra.initialize(config_path=str(pathlib.Path(__file__).parent.joinpath(
-        './manifeel','config')), version_base=None)
+        './TVB','config')), version_base=None)
     # Load configuration
     # TO-DO: allows passing argument for config_name
     cfg = hydra.compose(config_name=str(cfg_name))

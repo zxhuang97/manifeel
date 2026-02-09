@@ -14,7 +14,7 @@ import rerun as rr
 from tqdm import tqdm
 import numpy as np
 
-from manifeel.utils.shear_tactile_viz_utils import visualize_tactile_shear_image, visualize_penetration_depth
+from TVB.utils.shear_tactile_viz_utils import visualize_tactile_shear_image, visualize_penetration_depth
 
 EPISODES = os.getenv("EPISODES")
 
@@ -36,7 +36,7 @@ OmegaConf.register_new_resolver("eval", eval, replace=True)
 
 @hydra.main(
     version_base=None,
-    config_path=str(pathlib.Path(__file__).parent.joinpath("./manifeel", "config")),
+    config_path=str(pathlib.Path(__file__).parent.joinpath("./TVB", "config")),
 )
 def main(cfg: OmegaConf):
     OmegaConf.resolve(cfg)

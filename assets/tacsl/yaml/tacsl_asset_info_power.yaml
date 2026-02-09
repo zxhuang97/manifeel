@@ -4,7 +4,7 @@ power_3prongs:
         urdf_path: 'power_plug'
         diameter: 0.003988
         length: 0.050
-        density: 8000.0 
+        density: 80000.0 # default 8000.0
         friction: 1.0
         grasp_offset: 0.04
         plug_width: 0.004
@@ -80,7 +80,7 @@ USB_plug:
         urdf_path: 'USB_plug'
         diameter: 0.007986
         length: 0.050
-        density: 8000.0
+        density: 80000.0 # default 8000.0
         friction: 1.0
         grasp_offset: 0.04
         plug_width: 0.008
@@ -333,6 +333,26 @@ classfication_ball:
     ball_holder:
         urdf_par_dir: 'industreal'
         urdf_path: 'industreal_round_peg_16mm'
+        diameter: 0.0041
+        height: 0.028
+        depth: 0.023
+        density: 8000.0
+        friction: 0.5
+
+
+soft_cheese:
+    cheese:
+        urdf_par_dir: 'industreal'
+        urdf_path: 'industreal_round_peg_8mm'
+        diameter: 0.003988
+        length: 0.050
+        density: 8000.0 
+        friction: 1.0
+        grasp_offset: 0.04
+        plug_width: 0.004
+    ball_holder:
+        urdf_par_dir: 'industreal'
+        urdf_path: 'soft_cheese'
         diameter: 0.0041
         height: 0.028
         depth: 0.023

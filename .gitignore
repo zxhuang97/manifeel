@@ -3,7 +3,6 @@ outputs/
 data/
 wandb/
 # assets/
-taming/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -176,3 +175,24 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+*.pkl
+*.pickle
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.zip
+*.tar
+*.gz
+wandb/
+runs/
+logs/
+__pycache__/
+*.pyc
+assets/industreal/mesh/TVB_mesh/car1.obj

@@ -121,7 +121,7 @@ rectangular_peg_hole_12mm:
         width: 0.011957
         depth: 0.007910
         length: 0.050
-        density: 8000.0
+        density: 320000.0 # default: 8000.0
         friction: 1.0
         grasp_offset: 0.04
         plug_width: 0.012

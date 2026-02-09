@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
 setup(
-  name = 'manifeel',
+  name = 'TVB',
   packages = find_packages(),
 )

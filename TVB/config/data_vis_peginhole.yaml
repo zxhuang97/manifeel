@@ -1,0 +1,44 @@
+name: data_vis
+
+dataset_path: &dataset_path /home/quan/Projects/TVB/data/usb_color_combined_dataset
+# dataset_path: &dataset_path data/ryan_square_pah_dataset
+
+image_shape: &image_shape [3, 256, 256]
+shape_meta: &shape_meta
+  # acceptable types: rgb, low_dim
+  obs:
+    # front:
+    #   shape: *image_shape
+    #   type: rgb
+    # side:
+    #   shape: *image_shape
+    #   type: rgb
+    wrist:
+      shape: *image_shape
+      type: rgb
+    # side:
+    #   shape: *image_shape
+    #   type: rgb
+    left_tactile_camera_taxim:
+      shape: [3, 320, 240]
+      type: rgb
+    # tactile_force_field_right:
+    #   shape: [3, 10, 14]
+    #   type: rgb
+    state:
+      shape: [7]
+      type: low_dim
+  action:
+    shape: [6]
+
+task:
+  dataset:
+    _target_: TVB.dataset.tvb_dataset.TVBDataset
+    shape_meta: ${shape_meta}
+    zarr_path: *dataset_path
+    horizon: 16
+    pad_before: 1
+    pad_after: 7
+    seed: 42
+    val_ratio: 0.02
+    max_train_episodes: 90
