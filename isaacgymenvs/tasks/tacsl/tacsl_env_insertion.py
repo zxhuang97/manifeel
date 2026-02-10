@@ -219,7 +219,7 @@ class TacSLEnvInsertion(TacSLBase, TacSLSensors, FactoryABCEnv):
         """Set plug and socket asset options. Import assets."""
 
         urdf_root = os.path.join(os.path.dirname(__file__), 
-                                 '..', '..', '..', '..', '..', 'TVB', 'assets')
+                                 '..', '..', '..', '..', '..', 'manifeel', 'assets')
 
         plug_options = gymapi.AssetOptions()
         plug_options.flip_visual_attachments = False
