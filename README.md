@@ -92,7 +92,7 @@ exit
 
 ---
 
-## 4. ManiFeel Run on HPC
+## 4. ManiFeel Run on Cluster with Slurm
 
 Once the ManiFeel environment and Apptainer container have been correctly set up, you can run training for any ManiFeel task.  
 As an example, this section shows how to train a **vision-only Diffusion Policy** for the **USB insertion** task, i.e., [usb_quan_Aug05](https://purdue0-my.sharepoint.com/:u:/g/personal/luu15_purdue_edu/IQCdNkl_s-74RYTJNMFSpBr-AewG5Dzp4pAsq6NNBEAp_aU?e=97e4OR). Make sure that the ManiFeel demo dataset for USB insertion has already been downloaded and placed in `manifeel/data/usb_quan_Aug05`:
@@ -116,11 +116,11 @@ Paste the following script into it:
 > • Searh for `[user]` in the script file and replace `[user]` with your own cluster username.  
 > • Ensure that `CONTAINER_FILE` correctly points to where you stored your `manifeel.sif` file
 >   ```
->   CONTAINER_FILE=/scratch/gilbreth/[user]/manifeel.sif
+>   CONTAINER_FILE=/path/to/cluster/[user]/manifeel.sif
 >   ```  
 > • Confirm that the `cd` command correctly points to your `manifeel` repository path, matching the actual location of your `manifeel` repo on the cluster.
 >   ```
->   cd /scratch/gilbreth/[user]/Projects/manifeel
+>   cd /path/to/cluster/[user]/Projects/manifeel
 >   ```  
 
 
@@ -141,7 +141,7 @@ EXP_NAME="${INPUT_TYPE}_${ENV}_${NUM_DEMOS}"
 
 JOB_NAME="${EXP_NAME}_${SEED}" # The name of the Slurm job to monitor 
 
-CONTAINER_FILE=/scratch/gilbreth/[user]/manifeel.sif
+CONTAINER_FILE=/path/to/cluster/[user]/manifeel.sif
 
 cat <<EOT > job_script_${JOB_NAME}.sh
 #!/bin/bash
@@ -161,7 +161,7 @@ apptainer exec --nv ${CONTAINER_FILE} bash -c "
     source ~/.bashrc
     conda activate manifeel
     export LD_LIBRARY_PATH=\${CONDA_PREFIX}/lib:\${LD_LIBRARY_PATH}
-    cd /scratch/gilbreth/[user]/Projects/manifeel
+    cd /path/to/cluster/[user]/Projects/manifeel
     python train.py \
         --config-name=train_diffusion_workspace.yaml \
         task=${TASK_NAME} \
@@ -335,7 +335,7 @@ After updating your script, start the run:
 
 ## 5. Run ManiFeel Locally (PC or Workstation)
 
-This section mirrors the HPC workflow but runs training directly on a local machine without Slurm. It assumes:
+This section mirrors the Cluster workflow but runs training directly on a local machine without Slurm. It assumes:
 
 * `manifeel.sif` has already been built
 * The `manifeel` Conda environment
@@ -415,7 +415,7 @@ bash scripts/run_local.sh
 ```    
 
 ### 5.7 Summary
-The local workflow is identical to the HPC setup, except:
+The local workflow is identical to the Cluster setup, except:
   * No Slurm submission or `job_submit.sh`
   * Direct execution via bash `scripts/run_local.sh`
   * All sensing configurations are controlled by overriding environment variables at launch time
