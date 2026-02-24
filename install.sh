@@ -38,21 +38,45 @@ fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Get conda base path early so we can use it as the default env path
+CONDA_BASE=$($CONDA_CMD info --base)
+
+# Function to prompt the user for the conda environment installation path.
+# The default is <conda_base>/envs/manifeel. Press Enter to accept it.
+get_conda_env_path() {
+    local default_path="$CONDA_BASE/envs/manifeel"
+
+    echo ""
+    echo "=========================================="
+    echo "Conda Environment Path"
+    echo "=========================================="
+    echo "Default environment path: $default_path"
+    read -rp "Enter conda environment path (press Enter to use default): " user_path
+
+    if [ -z "$user_path" ]; then
+        CONDA_ENV_PATH="$default_path"
+    else
+        CONDA_ENV_PATH="$user_path"
+    fi
+
+    echo "✓ Using environment path: $CONDA_ENV_PATH"
+}
+
 echo ""
 echo "=========================================="
 echo "Setting up ManiFeel environment"
 echo "=========================================="
 
-# Create conda environment
-echo "Creating Python 3.8 environment 'manifeel'..."
-$CONDA_CMD create --name manifeel python=3.8 -y
+get_conda_env_path
 
-# Get conda base path
-CONDA_BASE=$($CONDA_CMD info --base)
+# Create conda environment at the chosen path
+echo "Creating Python 3.8 environment at '$CONDA_ENV_PATH'..."
+$CONDA_CMD create --prefix "$CONDA_ENV_PATH" python=3.8 -y
+
 source "$CONDA_BASE/etc/profile.d/conda.sh"
 
 # Activate environment
-conda activate manifeel
+conda activate "$CONDA_ENV_PATH"
 
 echo ""
 echo "=========================================="
@@ -86,7 +110,7 @@ if [ "${CI:-false}" = "true" ]; then
 elif [ ! -d "$PARENT_DIR/manifeel-isaacgymenvs" ]; then
     echo "Cloning manifeel-isaacgymenvs..."
     cd "$PARENT_DIR"
-    git clone https://github.com/quan-luu/manifeel-isaacgymenvs.git
+    git clone https://github.com/purdue-mars/manifeel-isaacgymenvs.git
     cd manifeel-isaacgymenvs
     git checkout manifeel-tacff
     pip install -e .
@@ -137,6 +161,6 @@ echo "   https://purdue0-my.sharepoint.com/:f:/g/personal/luu15_purdue_edu/IgClD
 echo "   and place it in manifeel/data/"
 echo ""
 echo "To activate the environment:"
-echo "  conda activate manifeel"
+echo "  conda activate $CONDA_ENV_PATH"
 echo "  export LD_LIBRARY_PATH=\${CONDA_PREFIX}/lib:\${LD_LIBRARY_PATH}"
 echo ""
