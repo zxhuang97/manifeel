@@ -41,31 +41,33 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 # Get conda base path early so we can use it as the default env path
 CONDA_BASE=$($CONDA_CMD info --base)
 
-# Function to prompt the user for the conda environment installation path.
-# The default is <conda_base>/envs/manifeel. Press Enter to accept it.
+# Function to prompt the user for the Miniforge/conda home directory.
+# The environment is always named "manifeel" and will be created at
+# <miniforge_home>/envs/manifeel. Press Enter to accept the detected default.
 # In CI mode (CI=true), the default is used automatically without prompting.
 get_conda_env_path() {
-    local default_path="$CONDA_BASE/envs/manifeel"
+    local default_home="$CONDA_BASE"
 
     echo ""
     echo "=========================================="
     echo "Conda Environment Path"
     echo "=========================================="
-    echo "Default environment path: $default_path"
+    echo "Detected Miniforge/conda home: $default_home"
 
     if [ "${CI:-false}" = "true" ]; then
-        CONDA_ENV_PATH="$default_path"
-        echo "CI mode: using default path"
+        MINIFORGE_HOME="$default_home"
+        echo "CI mode: using default Miniforge home"
     else
-        read -rp "Enter conda environment path (press Enter to use default): " user_path
-        if [ -z "$user_path" ]; then
-            CONDA_ENV_PATH="$default_path"
+        read -rp "Enter Miniforge home directory (press Enter to use default): " user_home
+        if [ -z "$user_home" ]; then
+            MINIFORGE_HOME="$default_home"
         else
-            CONDA_ENV_PATH="$user_path"
+            MINIFORGE_HOME="$user_home"
         fi
     fi
 
-    echo "✓ Using environment path: $CONDA_ENV_PATH"
+    CONDA_ENV_PATH="$MINIFORGE_HOME/envs/manifeel"
+    echo "✓ Environment will be created at: $CONDA_ENV_PATH"
 }
 
 echo ""
