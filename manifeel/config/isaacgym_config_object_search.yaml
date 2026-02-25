@@ -9,10 +9,10 @@ experiment: ''
 # needs this to override during the runtime
 # as the env_runner is instantiated
 shape_meta: null
-light_factor: 1.0
 
 # if set to positive integer, overrides the default number of environments
 num_envs: 1
+light_factor: 1.0
 
 # set to True for deterministic performance
 torch_deterministic: False
@@ -43,7 +43,7 @@ headless: True
 
 # set default task and default training config based on task
 defaults:
-  - task: TacSLTaskPickInBox
+  - task: TacSLTaskObjectSearch
   - override hydra/job_logging: disabled
   - _self_
 

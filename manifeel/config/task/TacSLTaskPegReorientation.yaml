@@ -5,7 +5,7 @@ defaults:
     - TacSLBase
     - _self_
 
-name: TacSLTaskSearchInBox
+name: TacSLTaskPegReorientation
 physics_engine: ${..physics_engine}
 
 sim:
@@ -15,7 +15,7 @@ env:
     task_type: insertion #  insertion, placement, screwing
     numEnvs: ${resolve_default:128,${...num_envs}}
     numObservations: 21
-    numActions: 7
+    numActions: 6
     controlFrequencyInv: 4
 
     # set to True if you use camera sensors in the environment
@@ -57,8 +57,8 @@ env:
     joint_damping: null
     default_gripper_joint_friction: 0.5   # set to this value, when domain randomizing other joints
     default_gripper_joint_damping: 0.0   # set to this value, when domain randomizing other joints
-    franka_open_gripper_width: 0.04   # finger joint target to open gripper
-    franka_close_gripper_width: 0.0 #0.001  # finger joint target to close gripper, 0.0 is fully closed, can be greater than 0 but needs to smaller than the width of the grasped object
+    franka_open_gripper_width: 0.03   # finger joint target to open gripper
+    franka_close_gripper_width: 0.009 #0.001  # finger joint target to close gripper, 0.0 is fully closed, can be greater than 0 but needs to smaller than the width of the grasped object
 
     use_physx_gripper_control: True
 
@@ -77,9 +77,9 @@ env:
     zero_out_normal_force_field_obs: False  # flag to set the normal force field to zero and only use shear force field
     asset_info_filename: 'tacsl_asset_info_power.yaml'   # industreal_asset_info_pegs.yaml, tacsl_asset_info_peg_placement.yaml, tacsl_asset_info_bolt_on_nut.yaml
     # 🖐🖐🖐 
-    desired_subassemblies: [ 'pick_in_box_battery']  
+    desired_subassemblies: [ 'pick_in_box_peg']  
     # desired_subassemblies: [ 'pick_in_box_battery']    # see all options in FactoryEnvInsertion.yaml
-    #pick_in_box, pick_in_box_item2, pick_in_box_item3, gear_with_handle, pick_in_box_peg,pick_in_box_battery
+    #pick_in_box_peg,pick_in_box_peg_fea_text, pick_in_box_peg_fea
     
     franka_urdf_file: 'tacsl_franka_gelsight_r15.urdf'
     franka_asset_dir: tacsl   # directory where franka urdf file is located e.g. tacsl, industreal, factory
@@ -94,7 +94,6 @@ env:
           image_type: rgb
           horizontal_fov: 75.0
           camera_pose: [[0.9, 0.0, 0.35], [-0.092, 0.0, 0.996, 0.0]]
-          # camera_pose: [[0.9, 0.0, 0.35], [-2.58819045e-01,  1.58480958e-17,  9.65925826e-01,  5.91458986e-17]]
         - name: wrist
           is_body_camera: True
           actor_name: franka
@@ -134,15 +133,15 @@ env:
 
 randomize:
     franka_arm_initial_dof_pos: [0.0002, -0.1591, 0.0005, -2.0966, -0.0002, 1.9335, 0.7855]
-    fingertip_midpoint_pos_initial: [0.5, 0.0, 0.07]  
+    fingertip_midpoint_pos_initial: [0.5, 0.0, 0.22]  
     # fingertip_midpoint_pos_initial: [0.5, 0.0, 0.15]  # initial position of midpoint between fingertips above table
-    # fingertip_midpoint_pos_noise: [0.1, 0.1, 0.05]  # noise on fingertip pos
-    fingertip_midpoint_pos_noise: [0.0, 0.0, 0.0]  # noise on fingertip pos
+    fingertip_midpoint_pos_noise: [0.1, 0.1, 0.05]  # noise on fingertip pos
     fingertip_midpoint_rot_initial: [3.1416, 0, 0.0]  # initial rotation of fingertips (Euler)
-    fingertip_midpoint_rot_noise: [0.0, 0.0, 0.0]
+    fingertip_midpoint_rot_noise: [0.05, 0.05, 0.5]
     # fingertip_midpoint_rot_noise: [0.1, 0.1, 1]  # noise on rotation
     plug_pos_in_gripper_noise_xy: [0.0, 0.0]  # noise on plug position within gripper
     plug_pos_z_in_gripper_noise_multiplier: 0  # [0, 1] scalar to multiply the noise level along z
+    # plug_noise_rot_in_gripper: [0.0, 0.0, 0.0]
     plug_noise_rot_in_gripper: [0.0, 0.5236, 0.0]  # noise on plug rotation within gripper, z is along the axis of the gripper can be [-np.pi, np.pi], y is across the axis can be [-np.pi/10, np.pi/10]
     socket_pos_xyz_initial: [0.5, 0.0, 0.01]  # initial XY position of socket on table
     socket_pos_xyz_noise: [0.0, 0.0, 0.0]
@@ -203,9 +202,9 @@ rl:
     contact_rich_region_size_factor: 0.5  # fraction of socket diameter defining area with reduced contact penalty
     use_shaped_keypoint_reward: False  # Flag to keypoint-based reward, to handle concave shape of the socket, and avoid the solution of the peg ending on the side of the socket, especially when using contact pen
 
-    close_error_thresh_lower: 0.12 # threshold below which plug is considered close enough to socket/goal
-    close_error_thresh_upper: 0.2  # threshold below which plug is considered close enough to socket/goal
-    close_error_thresh: 0.6666  # threshold below which plug is considered close enough to socket/goal, socket depth: 0.0089916
+    close_error_thresh_lower: 0.0 # threshold below which plug is considered close enough to socket/goal
+    close_error_thresh_upper: 0.03 # threshold below which plug is considered close enough to socket/goal
+    close_error_thresh: 0.03  # threshold below which plug is considered close enough to socket/goal, socket depth: 0.0089916
     # (-0.6668, -0.6658)
     success_bonus: 0.0  # bonus if plug is close enough to the goal
 

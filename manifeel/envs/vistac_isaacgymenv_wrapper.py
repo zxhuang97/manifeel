@@ -6,9 +6,9 @@ import isaacgym
 from isaacgymenvs.tasks.tacsl.tacsl_task_insertion import TacSLTaskInsertion
 from isaacgymenvs.tasks.tacsl.tacsl_task_power import TacSLTaskPowerInsertion
 from isaacgymenvs.tasks.tacsl.tacsl_task_gear import TacSLTaskGear
-from isaacgymenvs.tasks.tacsl.tacsl_task_pick_in_box import TacSLTaskPickInBox
-from isaacgymenvs.tasks.tacsl.tacsl_task_pick_in_box import TacSLTaskSearchkInBox
-from isaacgymenvs.tasks.tacsl.tacsl_task_class_ball import TacSLTaskClassBall
+from isaacgymenvs.tasks.tacsl.tacsl_task_peg_reorientation import TacSLTaskPegReorientation
+from isaacgymenvs.tasks.tacsl.tacsl_task_object_search import TacSLTaskObjectSearch
+from isaacgymenvs.tasks.tacsl.tacsl_task_ball_sorting import TacSLTaskBallSorting
 
 from isaacgymenvs.utils.reformat import omegaconf_to_dict
 

@@ -5,23 +5,23 @@ defaults:
     - TacSLBase
     - _self_
 
-name: TacSLTaskInsertion
+name: TacSLTaskObjectSearch
 physics_engine: ${..physics_engine}
 
 sim:
-    disable_gravity: True
+    disable_gravity: False #True #False
 
 env:
     task_type: insertion #  insertion, placement, screwing
     numEnvs: ${resolve_default:128,${...num_envs}}
     numObservations: 21
-    numActions: 6
+    numActions: 7
     controlFrequencyInv: 4
 
     # set to True if you use camera sensors in the environment
     enableCameraSensors: ${eval:'${.use_camera} + ${.use_isaac_gym_tactile}'}
 
-    peg_in_hand_buffer: 1.0 #default: 1.0  # scalar multiplier to increase peg length within gripper, during task initialization. reasonable range: [0.70, 1]; full range: [0.0, 1.] when 0, peg is fully with gripper
+    peg_in_hand_buffer: 0.7 # default: 1  # scalar multiplier to increase peg length within gripper, during task initialization. reasonable range: [0.70, 1]; full range: [0.0, 1.] when 0, peg is fully with gripper
 
     use_dict_obs: True
     obsDims: { 'ee_pos': [ 3 ], 'ee_quat': [ 4 ],
@@ -32,12 +32,13 @@ env:
                'wrist_2': [ 256, 256, 3 ],
                'left_tactile_camera_taxim': [ 320, 240, 3 ],
                'right_tactile_camera_taxim': [ 320, 240, 3 ],
-               'tactile_force_field_left': [ 10, 14, 3 ], 
+            #    'tactile_force_field_left': [ 10, 14, 3 ], 
                'tactile_force_field_right': [ 10, 14, 3 ],
-               'tactile_depth_left': [ 10, 14 ], 
+            #    'tactile_depth_left': [ 10, 14 ], 
                'tactile_depth_right': [ 10, 14 ],
+               'client': [ 256, 256, 3 ],
     }
-    stateDims: {}
+    stateDims: { }
 #    stateDims: { 'ee_pos': [ 3 ], 'ee_quat': [ 4 ], 'ee_lin_vel': [ 3 ], 'ee_ang_vel': [ 3 ],
 #                 'plug_pos': [ 3 ], 'plug_quat': [ 4 ] , 'socket_pos': [ 3 ], 'socket_quat': [ 4 ],
 #                 'dof_pos': [ 9 ], 'dof_vel': [ 9 ] }
@@ -56,17 +57,17 @@ env:
     joint_damping: null
     default_gripper_joint_friction: 0.5   # set to this value, when domain randomizing other joints
     default_gripper_joint_damping: 0.0   # set to this value, when domain randomizing other joints
-    franka_open_gripper_width: 0.08   # finger joint target to open gripper
-    franka_close_gripper_width: -0.01   # finger joint target to close gripper, 0.0 is fully closed, can be greater than 0 but needs to smaller than the width of the grasped object
+    franka_open_gripper_width: 0.04   # finger joint target to open gripper
+    franka_close_gripper_width: 0.0 #0.001  # finger joint target to close gripper, 0.0 is fully closed, can be greater than 0 but needs to smaller than the width of the grasped object
 
     use_physx_gripper_control: True
 
     use_gelsight: True  # flag to use Gelsight R1.5 finger
     use_isaac_gym_tactile: True
     use_compliant_contact: True
-    compliance_stiffness: 350.0  # this number depends on the contact force. consequently, it's effect varies with gripper gains
+    compliance_stiffness: 50.0  # this number depends on the contact force. consequently, it's effect varies with gripper gains
     compliant_damping: 0.0
-    elastomer_friction_factor: 1.0  # scale factor to increase/decrease the friction of the elastomer fingertip
+    elastomer_friction_factor: 0.5  # scale factor to increase/decrease the friction of the elastomer fingertip
     tactile_subsample_ratio: 1 # orginal: 4
     tactile_cam_euler_offset: [0.0, 0.0, 0.0]   # euler angle offset to tactile camera pose
     tactile_cam_zoom_level: 1.0   # scalar to zoom tactile camera in or out. If less than 1, zooms-in i.e. move camera closer
@@ -74,16 +75,26 @@ env:
     num_shear_rows: 10
     num_shear_cols: 14
     zero_out_normal_force_field_obs: False  # flag to set the normal force field to zero and only use shear force field
-    asset_info_filename: 'industreal_asset_info_pegs.yaml'   # industreal_asset_info_pegs.yaml, tacsl_asset_info_peg_placement.yaml, tacsl_asset_info_bolt_on_nut.yaml
-    # desired_subassemblies: ['round_peg_hole_12mm']   # see all options in FactoryEnvInsertion.yaml
-    desired_subassemblies: ['rectangular_peg_hole_16mm']   # see all options in FactoryEnvInsertion.yaml
-    # desired_subassemblies: [ 'gear_assembly']  
-
+    asset_info_filename: 'tacsl_asset_info_power.yaml'   # industreal_asset_info_pegs.yaml, tacsl_asset_info_peg_placement.yaml, tacsl_asset_info_bolt_on_nut.yaml
+    # 🖐🖐🖐 
+    desired_subassemblies: [ 'pick_in_box_battery']  
+    # desired_subassemblies: [ 'pick_in_box_battery']    # see all options in FactoryEnvInsertion.yaml
+    #pick_in_box, pick_in_box_item2, pick_in_box_item3, gear_with_handle, pick_in_box_peg,pick_in_box_battery
+    
     franka_urdf_file: 'tacsl_franka_gelsight_r15.urdf'
     franka_asset_dir: tacsl   # directory where franka urdf file is located e.g. tacsl, industreal, factory
 
     use_camera: True
     camera_configs:
+        - name: client
+          is_body_camera: False
+          actor_name: null
+          attach_link_name: null
+          image_size: [256, 256]
+          image_type: rgb
+          horizontal_fov: 75.0
+          camera_pose: [[0.9, 0.0, 0.35], [-0.092, 0.0, 0.996, 0.0]]
+          # camera_pose: [[0.9, 0.0, 0.35], [-2.58819045e-01,  1.58480958e-17,  9.65925826e-01,  5.91458986e-17]]
         - name: wrist
           is_body_camera: True
           actor_name: franka
@@ -108,8 +119,8 @@ env:
           image_type: rgb
           horizontal_fov: 75.0
           #camera_pose: [[0.8, 0.0, 0.5], [-2.58819045e-01,  1.58480958e-17,  9.65925826e-01,  5.91458986e-17]]   # R.from_euler('xyz', [0, np.pi/6, np.pi]).as_quat()
-          camera_pose: [[0.68, 0.0, 0.15], [-2.58819045e-01,  1.58480958e-17,  9.65925826e-01,  5.91458986e-17]]
-          # camera_pose: [[0.8, 0.0, 0.15], [-2.58819045e-01,  1.58480958e-17,  9.65925826e-01,  5.91458986e-17]]
+        #   camera_pose: [[0.68, 0.0, 0.15], [-2.58819045e-01,  1.58480958e-17,  9.65925826e-01,  5.91458986e-17]]
+          camera_pose: [[0.8, 0.0, 0.15], [-2.58819045e-01,  1.58480958e-17,  9.65925826e-01,  5.91458986e-17]]
         - name: side
           is_body_camera: False
           actor_name: null
@@ -118,20 +129,24 @@ env:
           image_type: rgb
           horizontal_fov: 75.0
           #camera_pose: [[0.3, -0.6797, 0.7099], [-0.1830127,  0.1830127,  0.6830127,  0.6830127]]   # R.from_euler('xyz', [0, np.pi/6, np.pi/2]).as_quat()
-          camera_pose: [[0.5, -0.17, 0.17], [-0.1830127,  0.1830127,  0.6830127,  0.6830127]] 
-          # camera_pose: [[0.5, -0.4, 0.17], [-0.1830127,  0.1830127,  0.6830127,  0.6830127]] 
+        #   camera_pose: [[0.5, -0.17, 0.17], [-0.1830127,  0.1830127,  0.6830127,  0.6830127]] 
+          camera_pose: [[0.5, -0.4, 0.17], [-0.1830127,  0.1830127,  0.6830127,  0.6830127]] 
 
 randomize:
     franka_arm_initial_dof_pos: [0.0002, -0.1591, 0.0005, -2.0966, -0.0002, 1.9335, 0.7855]
-    fingertip_midpoint_pos_initial: [0.5, 0.0, 0.15]  # initial position of midpoint between fingertips above table
-    fingertip_midpoint_pos_noise: [0.1, 0.1, 0.05]  # noise on fingertip pos
+    fingertip_midpoint_pos_initial: [0.5, 0.0, 0.07]  
+    # fingertip_midpoint_pos_initial: [0.5, 0.0, 0.15]  # initial position of midpoint between fingertips above table
+    # fingertip_midpoint_pos_noise: [0.1, 0.1, 0.05]  # noise on fingertip pos
+    fingertip_midpoint_pos_noise: [0.0, 0.0, 0.0]  # noise on fingertip pos
     fingertip_midpoint_rot_initial: [3.1416, 0, 0.0]  # initial rotation of fingertips (Euler)
-    fingertip_midpoint_rot_noise: [0.1, 0.1, 1]  # noise on rotation
+    fingertip_midpoint_rot_noise: [0.0, 0.0, 0.0]
+    # fingertip_midpoint_rot_noise: [0.1, 0.1, 1]  # noise on rotation
     plug_pos_in_gripper_noise_xy: [0.0, 0.0]  # noise on plug position within gripper
     plug_pos_z_in_gripper_noise_multiplier: 0  # [0, 1] scalar to multiply the noise level along z
     plug_noise_rot_in_gripper: [0.0, 0.5236, 0.0]  # noise on plug rotation within gripper, z is along the axis of the gripper can be [-np.pi, np.pi], y is across the axis can be [-np.pi/10, np.pi/10]
     socket_pos_xyz_initial: [0.5, 0.0, 0.01]  # initial XY position of socket on table
-    socket_pos_xyz_noise: [0.05, 0.05, 0.0]  # random initialization level on socket position
+    socket_pos_xyz_noise: [0.0, 0.0, 0.0]
+    # socket_pos_xyz_noise: [0.05, 0.05, 0.0]  # random initialization level on socket position
     socket_rot_initial: [0.0, 0.0, 0.0]  # initial rotation of socket on table
     socket_rot_noise: [0.0, 0.0, 0.0]  # random initialization level on socket rotation
     # socket_rot_noise: [0.0, 0.0, 0.785398]  # random initialization level on socket rotation
@@ -186,10 +201,12 @@ rl:
     use_shaped_contact_pen: True  # Flag to shape contact penalty
     contact_pen_reduction_scalar: 0.01  # scalar factor to reduce contact force penalty during contact-rich of the peg at the entrance of the socket
     contact_rich_region_size_factor: 0.5  # fraction of socket diameter defining area with reduced contact penalty
-    use_shaped_keypoint_reward: True  # Flag to keypoint-based reward, to handle concave shape of the socket, and avoid the solution of the peg ending on the side of the socket, especially when using contact pen
+    use_shaped_keypoint_reward: False  # Flag to keypoint-based reward, to handle concave shape of the socket, and avoid the solution of the peg ending on the side of the socket, especially when using contact pen
 
-    # close_error_thresh: 0.0044958  # threshold below which plug is considered close enough to socket/goal, socket depth: 0.0089916
-    close_error_thresh: 0.0089916 # threshold below which plug is considered close enough to socket/goal, socket depth: 0.0089916
+    close_error_thresh_lower: 0.12 # threshold below which plug is considered close enough to socket/goal
+    close_error_thresh_upper: 0.2  # threshold below which plug is considered close enough to socket/goal
+    close_error_thresh: 0.6666  # threshold below which plug is considered close enough to socket/goal, socket depth: 0.0089916
+    # (-0.6668, -0.6658)
     success_bonus: 0.0  # bonus if plug is close enough to the goal
 
     max_episode_length: 100000
@@ -220,7 +237,9 @@ ctrl:
         joint_deriv_gains: [8, 8, 8, 8, 8, 8, 8]
     task_space_impedance:
         motion_ctrl_axes: [1, 1, 1, 1, 1, 1]
-        task_prop_gains: [600, 600, 600, 50, 50, 50]
+        # task_prop_gains: [0, 0, 0, 0, 50, 0]
+        task_prop_gains: [500, 600, 600, 50, 50, 100]
+        # task_prop_gains: [600, 600, 600, 50, 50, 50]
         task_deriv_gains: [50, 50, 50, 1.41, 1.41, 1.41]
     task_space_nullspace:
         motion_ctrl_axes: [1, 1, 1, 1, 1, 1]
