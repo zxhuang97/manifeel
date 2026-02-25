@@ -135,7 +135,7 @@ DATASET_PATH=data/usb_quan_Aug05
 ISAACGYM_CONFIG="isaacgym_config_usb.yaml"
 ENV="usb_wrist_0805"
 LOG_NAME="dp_usb_tacff"
-TASK_NAME=vistac_pih_multiple_vision_onecam
+TASK_NAME=vision_wrist
 INPUT_TYPE="vision"
 EXP_NAME="${INPUT_TYPE}_${ENV}_${NUM_DEMOS}"  
 
@@ -226,7 +226,7 @@ If everything runs correctly, you will see the success rate and selected simulat
 To run the vision+tacRGB policy of the USB insertion policy, create a new copy of the bash script file `job_submit.sh` and/or modify the following two fields in your `job_submit.sh` script:
 
 ```bash
-TASK_NAME=vistac_pih_vision_tactile_onecam
+TASK_NAME=vistac_wrist
 INPUT_TYPE="vistac"
 ```
 
@@ -243,7 +243,7 @@ After updating, submit the script file:
 To run the vision+tacFF (tactile force-field) policy of the USB insertion policy, create a new copy of the bash script file `job_submit.sh` and/or modify the following two fields in your `job_submit.sh` script:
 
 ```bash
-TASK_NAME=vision_tacff
+TASK_NAME=visff_wrist
 INPUT_TYPE="tacff"
 ```
 
@@ -280,7 +280,7 @@ Next, create a new copy of `job_submit.sh` or modify your existing one by updati
 
 ```bash
 DATASET_PATH=data/sorting_quan_Aug8
-ISAACGYM_CONFIG="isaacgym_config_box_ball_class.yaml"
+ISAACGYM_CONFIG="isaacgym_config_ball_sorting.yaml"
 ENV="sorting_0923"
 LOG_NAME="dp_sorting_tacff"
 TASK_NAME=vision_front
@@ -310,7 +310,7 @@ python train.py \
 > For example, in the Ball Sorting task, which uses the **front camera** instead of a wrist camera, the valid task names are:  
 > - `TASK_NAME=vision_front` for vision-only  
 > - `TASK_NAME=vistac_front` for vision+tacRGB  
-> - `TASK_NAME=vision_tacff_front` for vision+tacFF  
+> - `TASK_NAME=visff_front` for vision+tacFF  
 >
 > Tasks such as **Ball Sorting**, **Object Search**, **Bulb Installation**, and **Nut-Bolt Threading** require gripper control and therefore use a **7 dimensional action space**. In these cases, ensure that  
 > ```
@@ -357,7 +357,7 @@ You can now launch training directly from your workstation. Logs and checkpoints
 To run the vision-only **USB insertion** policy, override the following variables at launch time:
 
 ```bash
-TASK_NAME=vistac_pih_multiple_vision_onecam \
+TASK_NAME=vision_wrist \
 INPUT_TYPE=vision \
 bash scripts/run_local.sh
 ```
@@ -368,7 +368,7 @@ You do not need to edit the script itself; the environment variables passed befo
 To run the vision + TacRGB policy, which enables RGB tactile images together with vision input, override:
 
 ```bash
-TASK_NAME=vistac_pih_vision_tactile_onecam \
+TASK_NAME=vistac_wrist \
 INPUT_TYPE=vistac \
 bash scripts/run_local.sh
 ```
@@ -377,7 +377,7 @@ bash scripts/run_local.sh
 To run the vision + TacFF (tactile force-field) policy, override:
 
 ```bash
-TASK_NAME=vision_tacff \
+TASK_NAME=visff_wrist \
 INPUT_TYPE=tacff \
 bash scripts/run_local.sh
 ```
@@ -387,7 +387,7 @@ To run other tasks such as **Ball Sorting**, first prepare the dataset inside `m
 
 ```bash
 DATASET_PATH=data/sorting_quan_Aug8 \
-ISAACGYM_CONFIG=isaacgym_config_box_ball_class.yaml \
+ISAACGYM_CONFIG=isaacgym_config_ball_sorting.yaml \
 ENV=sorting_0923 \
 TASK_NAME=vision_front \
 INPUT_TYPE=vision \
@@ -397,7 +397,7 @@ bash scripts/run_local.sh
 For front-camera tasks, valid task names include:
   * **Vision-only**: `TASK_NAME=vision_front`
   * **Vision + TacRGB**: `TASK_NAME=vistac_front`
-  * **Vision + TacFF**: `TASK_NAME=vision_tacff_front`
+  * **Vision + TacFF**: `TASK_NAME=visff_front`
     
 ### 5.6 Important Parameters
 When switching tasks or sensing modalities, the most critical variables are: `DATASET_PATH`, `ISAACGYM_CONFIG`, `TASK_NAME`, `INPUT_TYPE`.
@@ -409,7 +409,7 @@ Example:
 SEED=44 \
 NUM_DEMOS=50 \
 NUM_EPOCH=1000 \
-TASK_NAME=vision_tacff \
+TASK_NAME=visff_wrist \
 INPUT_TYPE=tacff \
 bash scripts/run_local.sh
 ```    
@@ -419,3 +419,17 @@ The local workflow is identical to the Cluster setup, except:
   * No Slurm submission or `job_submit.sh`
   * Direct execution via bash `scripts/run_local.sh`
   * All sensing configurations are controlled by overriding environment variables at launch time
+  
+## 6. Pretrained Tactile Representation Checkpoints
+
+Pretrained tactile representation checkpoints are required to run benchmarking across different tactile models. Download the pretrained checkpoints for UniT, T3, and AnyTouch from [here](https://drive.google.com/file/d/1MYDMc61vYzL8BTRPCbqNKIBgy-Rp66Sl/view?usp=sharing), then extract the `representation_models` folder into the top-level directory of the `manifeel` repository.
+
+The directory structure should look like:
+```
+parent_directory/
+├── IsaacGym_Preview_TacSL_Package/
+└── manifeel/
+    ├── data/
+    ├── representation_models/
+    └── manifeel/
+```

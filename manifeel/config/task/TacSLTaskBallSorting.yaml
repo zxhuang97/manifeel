@@ -5,7 +5,7 @@ defaults:
     - TacSLEnvGear
     - _self_
 
-name: TacSLTaskClassBall
+name: TacSLTaskBallSorting
 physics_engine: ${..physics_engine}
 
 sim:

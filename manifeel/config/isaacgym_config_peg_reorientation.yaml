@@ -43,7 +43,7 @@ headless: True
 
 # set default task and default training config based on task
 defaults:
-  - task: TacSLTaskInsertion_sPiHezy_peg_rotate
+  - task: TacSLTaskPegReorientation
   - override hydra/job_logging: disabled
   - _self_
 
