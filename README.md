@@ -1,5 +1,7 @@
 # ManiFeel
 
+[Paper](https://arxiv.org/abs/2505.18472) | [Website](https://zhengtongxu.github.io/manifeel-website/)
+
 ManiFeel is a benchmarking and learning platform for supervised visuotactile policy learning. It provides a comprehensive collection of visuotactile manipulation tasks and modular learning pipelines that include sensing modality configurations, tactile encoders, and policy heads. Built on IsaacGym/TacSL, a simulator for GelSight tactile sensors, the platform supports systematic studies and fair comparisons of supervised policies for contact-rich and visually-degraded manipulation tasks with the integration of visual and tactile sensing.
 
 ---
@@ -430,4 +432,19 @@ parent_directory/
     ├── data/
     ├── representation_models/
     └── manifeel/
+```
+
+---
+
+## 7. Citation
+
+If you use ManiFeel in your research, please cite our paper:
+
+```bibtex
+@article{luu2025manifeel,
+  title={Manifeel: Benchmarking and understanding visuotactile manipulation policy learning},
+  author={Luu, Quan Khanh and Zhou, Pokuang and Xu, Zhengtong and Zhang, Zhiyuan and Qiu, Qiang and She, Yu},
+  journal={arXiv preprint arXiv:2505.18472},
+  year={2025}
+}
 ```
