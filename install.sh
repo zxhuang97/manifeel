@@ -38,21 +38,53 @@ fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Get conda base path early so we can use it as the default env path
+CONDA_BASE=$($CONDA_CMD info --base)
+
+# Function to prompt the user for the Miniforge/conda home directory.
+# The environment is always named "manifeel" and will be created at
+# <miniforge_home>/envs/manifeel. Press Enter to accept the detected default.
+# In CI mode (CI=true), the default is used automatically without prompting.
+get_conda_env_path() {
+    local default_home="$CONDA_BASE"
+
+    echo ""
+    echo "=========================================="
+    echo "Conda Environment Path"
+    echo "=========================================="
+    echo "Detected Miniforge/conda home: $default_home"
+
+    if [ "${CI:-false}" = "true" ]; then
+        MINIFORGE_HOME="$default_home"
+        echo "CI mode: using default Miniforge home"
+    else
+        read -rp "Enter Miniforge home directory (press Enter to use default): " user_home
+        if [ -z "$user_home" ]; then
+            MINIFORGE_HOME="$default_home"
+        else
+            MINIFORGE_HOME="$user_home"
+        fi
+    fi
+
+    CONDA_ENV_PATH="$MINIFORGE_HOME/envs/manifeel"
+    echo "✓ Environment will be created at: $CONDA_ENV_PATH"
+}
+
 echo ""
 echo "=========================================="
 echo "Setting up ManiFeel environment"
 echo "=========================================="
 
-# Create conda environment
-echo "Creating Python 3.8 environment 'manifeel'..."
-$CONDA_CMD create --name manifeel python=3.8 -y
+get_conda_env_path
 
-# Get conda base path
-CONDA_BASE=$($CONDA_CMD info --base)
+# Create conda environment at the chosen path
+echo "Creating Python 3.8 environment at '$CONDA_ENV_PATH'..."
+$CONDA_CMD create --prefix "$CONDA_ENV_PATH" python=3.8 -y
+
 source "$CONDA_BASE/etc/profile.d/conda.sh"
 
 # Activate environment
-conda activate manifeel
+conda activate "$CONDA_ENV_PATH"
 
 echo ""
 echo "=========================================="
@@ -86,7 +118,7 @@ if [ "${CI:-false}" = "true" ]; then
 elif [ ! -d "$PARENT_DIR/manifeel-isaacgymenvs" ]; then
     echo "Cloning manifeel-isaacgymenvs..."
     cd "$PARENT_DIR"
-    git clone https://github.com/quan-luu/manifeel-isaacgymenvs.git
+    git clone https://github.com/purdue-mars/manifeel-isaacgymenvs.git
     cd manifeel-isaacgymenvs
     git checkout manifeel-tacff
     pip install -e .
@@ -137,6 +169,6 @@ echo "   https://purdue0-my.sharepoint.com/:f:/g/personal/luu15_purdue_edu/IgClD
 echo "   and place it in manifeel/data/"
 echo ""
 echo "To activate the environment:"
-echo "  conda activate manifeel"
+echo "  conda activate $CONDA_ENV_PATH"
 echo "  export LD_LIBRARY_PATH=\${CONDA_PREFIX}/lib:\${LD_LIBRARY_PATH}"
 echo ""
