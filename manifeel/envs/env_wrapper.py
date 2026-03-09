@@ -127,8 +127,8 @@ if __name__ == '__main__':
         for _ in range(5):
             random_actions = 2.0 * np.random.rand(wrapped_env.action_space.shape[0]) - 1.0
             obs, _, _, _ = wrapped_env.step(random_actions)
-            print(f"🚀obs_dict[tactile_force_field_left].shape: {obs['tactile_force_field_left'].shape}")
-            print(f"🚀obs_dict[tactile_depth_left].shape: {obs['tactile_depth_left'].shape}")
+            print(f"obs_dict[tactile_force_field_left].shape: {obs['tactile_force_field_left'].shape}")
+            print(f"obs_dict[tactile_depth_left].shape: {obs['tactile_depth_left'].shape}")
 
             # print(reward, reset)
             # tactile_rgb_image = observations['left_tactile_camera_taxim'][0]

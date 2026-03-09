@@ -220,7 +220,7 @@ def main(cfg: DictConfig):
     for _ in range(256):
 
         print_count = 0
-        print(f"⛳ print_count {print_count}" )
+        print(f"print_count {print_count}" )
         episode = list()
         # record in seed order, starting with 0
         seed = replay_buffer.n_episodes
@@ -300,7 +300,7 @@ def main(cfg: DictConfig):
             upper = ranges[choice]['upper']
             in_range = (reward >= lower) & (reward <= upper)
             in_range_val = ((reward >= lower) & (reward <= upper)).float()
-            print(f"🐝Reward: {reward[0].cpu().numpy():.6f}")     ######  -0.005
+            print(f"Reward: {reward[0].cpu().numpy():.6f}")     ######  -0.005
             update_plot(reward)
             # print(f"in_range_val  {in_range_val}")
             # print(f"🚀Reward in range: {in_range.item()}")

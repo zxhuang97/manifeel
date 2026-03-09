@@ -192,7 +192,7 @@ if __name__=='__main__':
         dataset = hydra.utils.instantiate(cfg.task.dataset)
         assert isinstance(dataset, BaseImageDataset)
 
-        print("🚀Dataset length: ", len(dataset))
+        print("Dataset length: ", len(dataset))
 
         for test_id in range(0, 10):
             side_img = dataset[test_id]['obs']['wrist']
@@ -201,7 +201,7 @@ if __name__=='__main__':
             print("Obs shapes: ", side_img.shape, state.shape)
             print("Img Obs range: ",torch.min(side_img), torch.max(side_img))
             print("Action shape: ", action.shape)
-            print("✅Action range: ", torch.min(action), torch.max(action))
+            print("Action range: ", torch.min(action), torch.max(action))
         print("Finished")
 
         # normalizer = dataset.get_normalizer()

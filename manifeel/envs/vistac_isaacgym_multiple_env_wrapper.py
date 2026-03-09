@@ -164,12 +164,19 @@ class MultipleIsaacEnvWrapper():
             raise RuntimeError('Must run reset or step before render.')
         img_list = []
 
-        # If 'client' is available, compute the target size (height, width)
+        # If 'client' is available in the cache, compute the target size (height, width)
         target_shape = None
-        if 'client' in self.vision_obs_keys:
+        if 'client' in self.render_cache:
             target_shape = self.render_cache['client'].shape[2:4]  # (H, W)
+        else:
+            for key in self.vision_obs_keys:
+                if key in self.render_cache and len(self.render_cache[key].shape) == 4:
+                    target_shape = self.render_cache[key].shape[2:4]
+                    break
 
         for obs_view in self.vision_obs_keys:
+            if obs_view not in self.render_cache:
+                continue
             imgs = self.render_cache[obs_view]  # (num_envs, 3, H, W)
             # print(f"✅rendering view: {obs_view}, imgs shape: {imgs.shape}")
             

@@ -16,6 +16,9 @@ INPUT_TYPE=${INPUT_TYPE:-vision}   # vision | vistac | tacff
 ENV_TAG=${ENV_TAG:-usb_wrist_0805}
 LOG_NAME=${LOG_NAME:-dp_usb_tacff}
 
+# GPU device index (0-based physical index; used for IsaacGym graphics and CUDA_VISIBLE_DEVICES)
+GPU=${GPU:-0}
+
 # Optional Hydra overrides
 IMAGENET_NORM=${IMAGENET_NORM:-false}   # set true for tacff runs if needed
 ACTION_SHAPE=${ACTION_SHAPE:-}          # set to 7 for gripper tasks, leave empty otherwise
@@ -44,6 +47,7 @@ HYDRA_ARGS=(
   "isaacgym_cfg_name=${ISAACGYM_CONFIG}"
   "training.seed=${SEED}"
   "training.num_epochs=${NUM_EPOCH}"
+  "training.device=cuda:${GPU}"
   "task.dataset.max_train_episodes=${NUM_DEMOS}"
   "hydra.run.dir=${OUT_DIR}"
   "logging.project=${LOG_NAME}"
@@ -60,7 +64,7 @@ fi
 # -------------------------
 # Run inside Apptainer
 # -------------------------
-apptainer exec --nv --cleanenv --env LD_PRELOAD= "${REPO_ROOT}/${CONTAINER_FILE}" bash -ic "
+apptainer exec --nv --cleanenv --env LD_PRELOAD= --env GPU="${GPU}" "${REPO_ROOT}/${CONTAINER_FILE}" bash -ic "
   set -e
   conda activate manifeel
   export LD_LIBRARY_PATH=\${CONDA_PREFIX}/lib:\${LD_LIBRARY_PATH}

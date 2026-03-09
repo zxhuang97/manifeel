@@ -137,7 +137,7 @@ def main(cfg: DictConfig):
             obs, reward, reset, info = env.step(actions)
 
 
-            print(f"🖼Reward: {reward[0].cpu().numpy()}")
+            print(f"Reward: {reward[0].cpu().numpy()}")
 
             # print(obs['ee_pos'][0].cpu().numpy(), 
             #       obs['ee_quat'].cpu().numpy())

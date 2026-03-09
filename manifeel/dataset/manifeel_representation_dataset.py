@@ -176,12 +176,12 @@ if __name__=='__main__':
         dataset = ManifeelRepresentationDataset(**cfg.dataset)
         assert isinstance(dataset, BaseImageDataset)
 
-        print("🚀Dataset length: ", len(dataset))
+        print("Dataset length: ", len(dataset))
 
         for test_id in range(0, 10):
             img = dataset[test_id]['image']
-            print("✅Img range: ",torch.min(img), torch.max(img))
-            print("✅Img shape: ", img.shape)
+            print("Img range: ",torch.min(img), torch.max(img))
+            print("Img shape: ", img.shape)
         print("Finished")
 
         # normalizer = dataset.get_normalizer()
