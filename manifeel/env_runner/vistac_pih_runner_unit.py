@@ -107,7 +107,7 @@ class ManifeelRunner(BaseImageRunner):
         # actions = list()
         # side_obss = list()
         # wrist_obss = list()
-
+    
         while not done:
             # create obs dict
             np_obs_dict = dict(obs)
@@ -136,7 +136,6 @@ class ManifeelRunner(BaseImageRunner):
             obs_dict = dict_apply(np_obs_dict, 
                 lambda x: torch.from_numpy(x).to(
                     device=device))
-
             # run policy
             with torch.no_grad():
                 action_dict = policy.predict_action(obs_dict)

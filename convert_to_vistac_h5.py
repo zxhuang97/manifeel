@@ -16,8 +16,8 @@ Zarr source format (manifeel):
 Output H5 format (vistac.py expects <ds_path>/<split>.h5):
   action           (N, D)
   state            (N, 7)
-  wrist            vlen uint8     JPEG-encoded frames (one entry per step)
-  taxim            vlen uint8     JPEG-encoded frames (one entry per step)
+  wrist            vlen uint8     JPEG-encoded frames resized to 224×224 (one entry per step)
+  taxim            vlen uint8     JPEG-encoded frames resized to 224×224 (one entry per step)
   trial_success    (num_episodes,) float32  (1.0 = success)
   episode_lens     (num_episodes,)
   episode_starts   (num_episodes,)
@@ -38,6 +38,7 @@ import zarr
 import h5py
 import cv2
 import tqdm
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 ZARR_TASKS = [
@@ -60,14 +61,19 @@ PLAIN_KEYS = ["action", "state", "tactile_force_field_right", "tactile_depth_rig
 JPEG_CAMERA_KEYS = ["wrist", "front", "side", "wrist_2"]
 
 
-def encode_jpeg_vlen(images_nhwc, quality=90):
-    """Encode (N, H, W, 3) float32 [0,1] array to list of JPEG byte arrays."""
+IMAGE_SIZE = (224, 224)
+
+
+def encode_jpeg_vlen(images_nhwc, quality=95):
+    """Encode (N, H, W, 3) float32 [0,1] array to list of JPEG byte arrays, resized to IMAGE_SIZE."""
     imgs_uint8 = (np.clip(images_nhwc, 0, 1) * 255).astype(np.uint8)
     encoded = []
     for img in imgs_uint8:
+        if img.shape[:2] != IMAGE_SIZE:
+            img = cv2.resize(img, (IMAGE_SIZE[1], IMAGE_SIZE[0]), interpolation=cv2.INTER_LINEAR)
         # zarr taxim images are RGB; cv2 expects BGR for imencode
-        img_bgr = img[..., ::-1]
-        success, buf = cv2.imencode('.jpg', img_bgr, [cv2.IMWRITE_JPEG_QUALITY, quality])
+        # img_bgr = img[..., ::-1]
+        success, buf = cv2.imencode('.jpg', img, [cv2.IMWRITE_JPEG_QUALITY, quality])
         assert success
         encoded.append(np.frombuffer(buf.tobytes(), dtype=np.uint8))
     return encoded
@@ -139,6 +145,35 @@ def convert_zarr_to_h5(zarr_path, out_h5_path, episode_indices, keys_to_save, ta
         print(f"  Saved metadata: {len(episode_indices)} episodes, {num_sel_steps} steps")
 
 
+def convert_task(task, data_dir, out_dir, out_name, val_ratio, keys, taxim_key, jpeg_quality):
+    """Convert one zarr task folder to H5 splits. Designed to run in a subprocess."""
+    zarr_path = os.path.join(data_dir, task)
+    if not os.path.exists(zarr_path):
+        print(f"[SKIP] {task}: not found at {zarr_path}", flush=True)
+        return
+
+    store = zarr.open(zarr_path, mode='r')
+    ep_ends = np.array(store['meta']['episode_ends'])
+    num_eps = len(ep_ends)
+
+    all_idx = np.arange(num_eps)
+    n_val = max(1, int(num_eps * val_ratio))
+    train_idx = all_idx[:-n_val]
+    val_idx = all_idx[-n_val:]
+
+    print(f"\n=== {task}: {num_eps} episodes -> {len(train_idx)} train / {n_val} val+debug ===", flush=True)
+
+    splits = [
+        ('training',   train_idx),
+        ('validation', val_idx),
+        ('debug',      val_idx),
+    ]
+    for split, ep_idx in splits:
+        out_path = os.path.join(out_dir, out_name, f"{split}.h5")
+        print(f"  [{task}:{split}] -> {out_path}", flush=True)
+        convert_zarr_to_h5(zarr_path, out_path, ep_idx, keys, taxim_key, jpeg_quality)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str,
@@ -158,40 +193,34 @@ def main():
                         help='Float array keys to copy verbatim (wrist/camera keys are always JPEG-encoded separately)')
     parser.add_argument('--taxim_key', type=str, default='right_tactile_camera_taxim',
                         help='Key for tactile camera image to JPEG-encode as taxim (empty string to skip)')
-    parser.add_argument('--jpeg_quality', type=int, default=90,
+    parser.add_argument('--jpeg_quality', type=int, default=95,
                         help='JPEG quality for taxim encoding')
+    parser.add_argument('--workers', type=int, default=None,
+                        help='Number of parallel worker processes (default: number of tasks)')
     args = parser.parse_args()
 
     tasks = args.tasks or ZARR_TASKS
     taxim_key = args.taxim_key if args.taxim_key else None
 
-    for task in tasks:
-        zarr_path = os.path.join(args.data_dir, task)
-        if not os.path.exists(zarr_path):
-            print(f"[SKIP] {task}: not found at {zarr_path}")
-            continue
-
-        store = zarr.open(zarr_path, mode='r')
-        ep_ends = np.array(store['meta']['episode_ends'])
-        num_eps = len(ep_ends)
-
-        out_name = args.name if args.name else task
-
-        all_idx = np.arange(num_eps)
-        n_val = max(1, int(num_eps * args.val_ratio))
-        val_idx = all_idx[-n_val:]   # last 10%
-
-        print(f"\n=== {task}: {num_eps} episodes -> {num_eps} train / {n_val} val+debug ===")
-
-        splits = [
-            ('training',   all_idx),
-            ('validation', val_idx),
-            ('debug',      val_idx),
-        ]
-        for split, ep_idx in splits:
-            out_path = os.path.join(args.out_dir, out_name, f"{split}.h5")
-            print(f"  [{split}] -> {out_path}")
-            convert_zarr_to_h5(zarr_path, out_path, ep_idx, args.keys, taxim_key, args.jpeg_quality)
+    if len(tasks) == 1:
+        out_name = args.name if args.name else tasks[0]
+        convert_task(tasks[0], args.data_dir, args.out_dir, out_name,
+                     args.val_ratio, args.keys, taxim_key, args.jpeg_quality)
+    else:
+        n_workers = args.workers or len(tasks)
+        print(f"Converting {len(tasks)} tasks with {n_workers} parallel workers...")
+        futures = {}
+        with ProcessPoolExecutor(max_workers=n_workers) as pool:
+            for task in tasks:
+                out_name = task  # --name is only meaningful for single-task runs
+                fut = pool.submit(convert_task, task, args.data_dir, args.out_dir, out_name,
+                                  args.val_ratio, args.keys, taxim_key, args.jpeg_quality)
+                futures[fut] = task
+            for fut in as_completed(futures):
+                task = futures[fut]
+                exc = fut.exception()
+                if exc:
+                    print(f"[ERROR] {task}: {exc}", flush=True)
 
     print("\nDone.")
 
