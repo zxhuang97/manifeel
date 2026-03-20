@@ -41,7 +41,8 @@ def main():
     parser.add_argument("--connect-timeout", type=float, default=180.0)
     parser.add_argument("--n-test", type=int, default=50)
     parser.add_argument("--n-test-vis", type=int, default=2)
-    parser.add_argument("--max-steps", type=int, default=500)
+    parser.add_argument("--max-steps", type=int, default=None,
+                        help="Episode step budget; defaults to task_info value if not set")
     parser.add_argument("--n-obs-steps", type=int, default=1)
     parser.add_argument("--n-action-steps", type=int, default=1)
     parser.add_argument("--seed", type=int, default=100000)
@@ -58,9 +59,10 @@ def main():
     task_cfg = OmegaConf.load(task_cfg_path)
     shape_meta = OmegaConf.to_container(task_cfg.shape_meta, resolve=True) if "shape_meta" in task_cfg else {}
     action_dim = get_by_isaacgym_cfg(args.isaacgym_cfg)["action_dim"]
+    max_steps  = args.max_steps if args.max_steps is not None else get_by_isaacgym_cfg(args.isaacgym_cfg)["max_steps"]
     if "action" in shape_meta:
         shape_meta["action"]["shape"] = [action_dim]
-    print(f"[eval] task={args.task_cfg}  action_dim={action_dim}")
+    print(f"[eval] task={args.task_cfg}  action_dim={action_dim}  max_steps={max_steps}")
 
     # ManifeelRunner needs GlobalHydra initialized to load the isaacgym config
     hydra.initialize_config_dir(config_dir=config_dir, version_base=None)
@@ -80,7 +82,7 @@ def main():
         n_test=args.n_test,
         n_test_vis=args.n_test_vis,
         test_start_seed=args.seed,
-        max_steps=args.max_steps,
+        max_steps=max_steps,
         n_obs_steps=args.n_obs_steps,
         n_action_steps=args.n_action_steps,
         fps=10,
