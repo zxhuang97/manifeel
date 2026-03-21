@@ -73,7 +73,7 @@ TASK_INFO = {
         "state_dim":    7,
         "dataset_name": "nutbolt_quan_July1",
         "task_cfg":     "vistac_wrist",
-        "isaacgym_cfg": "isaacgym_config_nutbolt.yaml",
+        "isaacgym_cfg": "isaacgym_config_nut.yaml",
         "max_steps":    500,
     },
     # ── peg-in-hole (6-DOF) ─────────────────────────────────────────────────

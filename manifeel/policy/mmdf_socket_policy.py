@@ -11,6 +11,7 @@ This client is responsible for mapping ManiFeel observation keys to MMDF
 modality names before sending to the server:
   right_tactile_camera_taxim  ->  taxim   (B, T, C, H, W) float32 in [0,1]
   wrist                      ->  wrist   (B, T, C, H, W) float32 in [0,1]
+  <rgb_key>                  ->  rgb     (B, T, C, H, W) float32 in [0,1]
   state                      ->  state   (B, T, 7)
 """
 
@@ -61,7 +62,7 @@ _KEY_MAP = {
     "wrist": "wrist",
     "state": "state",
 }
-_IMAGE_MODALITIES = {"taxim", "wrist"}
+_IMAGE_MODALITIES = {"taxim", "wrist", "rgb"}
 
 
 def _prepare_obs(obs_dict: dict) -> dict:
