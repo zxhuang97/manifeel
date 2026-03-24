@@ -153,6 +153,7 @@ class DiffusionTransformerImagePolicy(BaseImagePolicy):
             cond_mask = torch.zeros_like(cond_data, dtype=torch.bool)
             cond_data[:,:To,Da:] = nobs_features
             cond_mask[:,:To,Da:] = True
+            cond_mask[:, To:, Da:] = True
 
         nsample = self.conditional_sample(
             cond_data,
@@ -204,9 +205,9 @@ class DiffusionTransformerImagePolicy(BaseImagePolicy):
         batch_size = nactions.shape[0]
         horizon = nactions.shape[1]
         To = self.n_obs_steps
-        import pdb; pdb.set_trace()
         cond = None
         trajectory = nactions
+        import pdb; pdb.set_trace()
         if self.obs_as_cond:
             this_nobs = dict_apply(nobs,
                 lambda x: x[:,:To,...].reshape(-1, *x.shape[2:]))
@@ -218,16 +219,21 @@ class DiffusionTransformerImagePolicy(BaseImagePolicy):
                 end = start + self.n_action_steps
                 trajectory = nactions[:,start:end]
         else:
-            this_nobs = dict_apply(nobs, lambda x: x.reshape(-1, *x.shape[2:]))
+            this_nobs = dict_apply(nobs, lambda x: x[:,:To,...].reshape(-1, *x.shape[2:]))
             nobs_features = self.obs_encoder(this_nobs)
-            nobs_features = nobs_features.reshape(batch_size, horizon, -1)
-            trajectory = torch.cat([nactions, nobs_features], dim=-1).detach()
+            nobs_features = nobs_features.reshape(batch_size, To, -1)
+            Do = nobs_features.shape[-1]
+            trajectory = torch.zeros(batch_size, horizon, self.action_dim + Do,
+                                     device=nactions.device, dtype=nactions.dtype)
+            trajectory[:, :, :self.action_dim] = nactions
+            trajectory[:, :To, self.action_dim:] = nobs_features
 
         if self.pred_action_steps_only:
             condition_mask = torch.zeros_like(trajectory, dtype=torch.bool)
         else:
             condition_mask = self.mask_generator(trajectory.shape)
-
+        if not self.obs_as_cond:
+            condition_mask[:, To:, self.action_dim:] = True
         noise = torch.randn(trajectory.shape, device=trajectory.device)
         bsz = trajectory.shape[0]
         timesteps = torch.randint(
