@@ -1,6 +1,7 @@
 # Dataset / Outputs
 outputs/
 data/
+data2
 wandb/
 # assets/
 manifeel.sif
