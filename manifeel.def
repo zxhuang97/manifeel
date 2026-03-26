@@ -1,11 +1,11 @@
 Bootstrap: docker
-From: ubuntu:22.04
+From: ubuntu:24.04
 
 
 %labels
     Author          Quan Luu
     Version         1.0
-    Description     "Ubuntu 20.04"
+    Description     "Ubuntu 24.04"
 
 %post
     echo "Updating apt and installing required packages..."
@@ -28,15 +28,15 @@ From: ubuntu:22.04
         libxcursor1 \
         libglu-dev \
         libglfw3 \
-        libegl1-mesa \
+        libegl1 \
         libgl1-mesa-dev \
         freeglut3-dev \
         xvfb \
         libusb-1.0-0 \
         libusb-1.0-0-dev
 
-    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
-    dpkg -i cuda-keyring_1.0-1_all.deb
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+    dpkg -i cuda-keyring_1.1-1_all.deb
     apt-get update
     apt-get install -y libnvidia-gl-535
     apt-get install -y libisl-dev

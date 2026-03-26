@@ -71,6 +71,7 @@ fi
 # -------------------------
 apptainer exec --nv --cleanenv --env LD_PRELOAD= --env GPU="${GPU}" "${REPO_ROOT}/${CONTAINER_FILE}" bash -ic "
   set -e
+
   conda activate manifeel
   export LD_LIBRARY_PATH=\${CONDA_PREFIX}/lib:\${LD_LIBRARY_PATH}
   cd '${REPO_ROOT}'

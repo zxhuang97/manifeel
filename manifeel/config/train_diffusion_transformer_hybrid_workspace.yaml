@@ -13,14 +13,14 @@ dataset_path: data/square_pah_complex_dataset
 isaacgym_cfg_name: "isaacgym_config.yaml"
 
 n_demo: ${task.dataset.max_train_episodes}
-horizon: 10
+horizon: 16
 n_obs_steps: 2
 n_action_steps: 8
 n_latency_steps: 0
 dataset_obs_steps: ${n_obs_steps}
 past_action_visible: False
 keypoint_visible_rate: 1.0
-obs_as_cond: false
+obs_as_cond: true
 
 policy:
   _target_: manifeel.policy.diffusion_transformer_image_policy.DiffusionTransformerImagePolicy
@@ -107,8 +107,8 @@ training:
   use_ema: True
   rollout_every: 50
   checkpoint_every: 50
-  val_every: 10000
-  sample_every: 10000
+  val_every: 50
+  sample_every: 50
   max_train_steps: null
   max_val_steps: null
   tqdm_interval_sec: 1.0
@@ -120,7 +120,7 @@ logging:
   resume: True
   mode: online
   name: ${now:%Y.%m.%d-%H.%M.%S}_${exp_name}
-  tags: ["${name}", "${task_name}", "${exp_name}"]
+  tags: ["${name}", "${task_name}"]
   id: null
   group: null
 

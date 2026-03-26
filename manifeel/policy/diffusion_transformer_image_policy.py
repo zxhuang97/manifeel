@@ -207,7 +207,7 @@ class DiffusionTransformerImagePolicy(BaseImagePolicy):
         To = self.n_obs_steps
         cond = None
         trajectory = nactions
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         if self.obs_as_cond:
             this_nobs = dict_apply(nobs,
                 lambda x: x[:,:To,...].reshape(-1, *x.shape[2:]))
@@ -258,6 +258,7 @@ class DiffusionTransformerImagePolicy(BaseImagePolicy):
 
         loss = F.mse_loss(pred, target, reduction='none')
         loss = loss * loss_mask.type(loss.dtype)
+        # loss = loss[:, :, :self.action_dim]
         loss = reduce(loss, 'b ... -> b (...)', 'mean')
         loss = loss.mean()
         return loss
