@@ -45,6 +45,11 @@ def main():
                         help="Episode step budget; defaults to task_info value if not set")
     parser.add_argument("--n-obs-steps", type=int, default=1)
     parser.add_argument("--n-action-steps", type=int, default=1)
+    parser.add_argument("--server-n-action-steps", type=int, default=None,
+                        help="Server-side action chunk size (action cache length). "
+                             "Recorded in results.json for reporting; does not change runtime behavior.")
+    parser.add_argument("--no-action-history", action="store_true", default=False,
+                        help="Recorded in results.json for reporting; does not change runtime behavior.")
     parser.add_argument("--seed", type=int, default=100000)
     parser.add_argument("--tactile-size", type=int, nargs=2, default=[224, 224])
     args = parser.parse_args()
@@ -100,6 +105,11 @@ def main():
         "summary": {
             "success_rate_mean": mean_score,
         },
+        "n_obs_steps": args.n_obs_steps,
+        "n_action_steps": args.n_action_steps,
+        "server_n_action_steps": args.server_n_action_steps,
+        "no_action_history": args.no_action_history,
+        "seed": args.seed,
         "log_data": {k: v for k, v in log_data.items() if not hasattr(v, "_path")},
     }
     with open(os.path.join(args.output_dir, "results.json"), "w") as f:
